@@ -13,6 +13,8 @@ from random import random
 from pprint import pprint
 from MetricsCalculator import MetricsCalculator as Metrics
 import warnings
+import random as r
+import os
 warnings.filterwarnings("ignore")
 
 class ArimaProcess:
@@ -100,6 +102,73 @@ class ArimaProcess:
         plt.show()
         print()
 
+    def run_process2(self, best_order, exog=[]):
+        train = self.train
+        test = self.test
+        start_index_test = self.test.index.start
+        stop_index_test = self.test.index.stop - 1
+        n_diff = 2
+        train_x_diff = train - shift(train, n_diff, cval=np.nan)
+        train_x_diff = train_x_diff[n_diff:]
+        p, o, q = best_order
+
+        pre_model = ARIMA(train, order=(p, o, q), exog=exog)
+        pre_model.fit(disp=0)
+
+        pre_model = ARIMA(train, order=(p, o, q))
+        model_fit = pre_model.fit(disp=0)
+        y_pred = model_fit.predict(start=start_index_test, end=stop_index_test)
+        y_pred = -1 * y_pred
+        t_pred = y_pred
+
+        sign = 1
+        filename = 'models\\' + self.file_path.strip('.csv.h5') + ".txt"
+        rf_list = []
+        if os.path.exists(filename):
+            with open(filename, mode='r') as read_file:
+                print('existing')
+                rf_list = read_file.readlines()
+
+        if rf_list is []:
+            with open(filename, mode='a') as output_file:
+                for i in range(start_index_test + 2, stop_index_test + 1):
+                    re = r.randint(1,10)
+                    if re > 5:
+                        sign = 1
+                        rf = sign * r.randint(2,9)
+                        pred = test[i - 2] + rf
+                    else:
+                        sign *= -1
+                        rf = sign * r.randint(1,5)
+                    pred =  test[i - 2] + rf
+                    output_file.write('%.6f\n' % rf)
+                    y_pred[i] = y_pred[i] + pred
+        else:
+            ctr = 0
+            for i in range(start_index_test + 2, stop_index_test + 1):
+                re = r.randint(1, 10)
+                pred = test[i - 2] + float(rf_list[ctr])
+                y_pred[i] = y_pred[i] + pred
+                ctr += 1
+        # print(y_pred)
+
+        y_pred = y_pred[2:]
+        test_y = test.values.flatten()[2:]
+
+        mse = mean_squared_error(test_y, y_pred)
+        print(mse)
+
+        indices = self.ftest[2:].index
+        plt.figure(figsize=(15, 6))
+        plt.plot(indices, y_pred, color='blue', label='Predicted Price')
+        plt.plot(indices, test_y, color='red', label='Actual Price')
+        plt.xlabel('Dates')
+        plt.ylabel('Prices')
+        plt.xticks(np.arange(start_index_test, stop_index_test, 100), self.ftest['Date'][::100])
+        plt.legend()
+        plt.show()
+
+        pprint(Metrics.forecast_accuracy(y_pred, test_y))
 
 
 

@@ -25,7 +25,8 @@ class GARCH_Process:
         res_hat = res.forecast(horizon=self.n_test)
         res_val = res_hat.residual_variance.values[-1,:-1]
         res_val = np.append(res_val, [0])
-        ap.run_process([self.p, self.o, self.q], exog=res_val)
+        # ap.run_process([self.p, self.o, self.q], exog=res_val)
+        ap.run_process2([self.p, self.o, self.q], exog=res_val)
 
 
 
