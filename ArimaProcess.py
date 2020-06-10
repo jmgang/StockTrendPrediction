@@ -112,8 +112,8 @@ class ArimaProcess:
         train_x_diff = train_x_diff[n_diff:]
         p, o, q = best_order
 
-        pre_model = ARIMA(train, order=(p, o, q), exog=exog)
-        pre_model.fit(disp=0)
+        # pre_model = ARIMA(train, order=(p, o, q), exog=exog)
+        # pre_model.fit(disp=0)
 
         pre_model = ARIMA(train, order=(p, o, q))
         model_fit = pre_model.fit(disp=0)
@@ -129,7 +129,7 @@ class ArimaProcess:
                 print('existing')
                 rf_list = read_file.readlines()
 
-        if rf_list is []:
+        if not rf_list:
             with open(filename, mode='a') as output_file:
                 for i in range(start_index_test + 2, stop_index_test + 1):
                     re = r.randint(1,10)
@@ -159,14 +159,14 @@ class ArimaProcess:
         print(mse)
 
         indices = self.ftest[2:].index
-        plt.figure(figsize=(15, 6))
-        plt.plot(indices, y_pred, color='blue', label='Predicted Price')
-        plt.plot(indices, test_y, color='red', label='Actual Price')
-        plt.xlabel('Dates')
-        plt.ylabel('Prices')
-        plt.xticks(np.arange(start_index_test, stop_index_test, 100), self.ftest['Date'][::100])
-        plt.legend()
-        plt.show()
+        # plt.figure(figsize=(15, 6))
+        # plt.plot(indices, y_pred, color='blue', label='Predicted Price')
+        # plt.plot(indices, test_y, color='red', label='Actual Price')
+        # plt.xlabel('Dates')
+        # plt.ylabel('Prices')
+        # plt.xticks(np.arange(start_index_test, stop_index_test, 100), self.ftest['Date'][::100])
+        # plt.legend()
+        # plt.show()
 
         pprint(Metrics.forecast_accuracy(y_pred, test_y))
 
