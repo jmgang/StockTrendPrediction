@@ -160,6 +160,7 @@ class ArimaProcess:
 
         indices = self.ftest[2:].index
         plt.figure(figsize=(15, 6))
+        plt.title(self.file_path.strip('.csv.h5'))
         plt.plot(indices, y_pred, color='blue', label='Predicted Price')
         plt.plot(indices, test_y, color='red', label='Actual Price')
         plt.xlabel('Dates')
